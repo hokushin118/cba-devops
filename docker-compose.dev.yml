@@ -1,5 +1,5 @@
 # Development profile
-# docker compose -f docker-compose.yml -f docker-compose-account.yml -f docker-compose.dev.yml up --build
+# docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 # You only need to include the services you are changing in the override file.
 # All other settings will be inherited from the original docker-compose.yml file.
 # Project name

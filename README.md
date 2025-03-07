@@ -120,15 +120,18 @@ Environment variables for each profile are configured in the `.env` files.
 
 ## Deployment on Kubernetes
 
-This guide outlines the steps to deploy microservices on a Kubernetes cluster.
+This guide outlines the steps to deploy microservices on
+a [Kubernetes](https://kubernetes.io) cluster.
 
 **Configuration Files:**
 
-* Kubernetes configuration files are located in the `k8s/` directory.
+* [Kubernetes](https://kubernetes.io) configuration files are located in
+  the `k8s/` directory.
 
 **Deployment Steps:**
 
-To deploy a microservice to **Kubernetes**, use the following commands:
+To deploy a microservice to [Kubernetes](https://kubernetes.io), use the
+following commands:
 
 1. **Namespace**: Apply the namespace yaml first. All other resources will be
    created within this namespace (**cba-dev**).
@@ -221,9 +224,11 @@ Check the HPA is created with:
 kubectl get hpa -n cba-dev
 ```
 
-## Deployment on OpenShift with Tekton
+## Deployment on Red Hat OpenShift with Tekton
 
-This guide outlines the steps to deploy your application on OpenShift using
+This guide outlines the steps to deploy your application
+on [Red Hat OpenShift](https://www.redhat.com/en/technologies/cloud-computing/openshift)
+using
 [Tekton](https://tekton.dev) Pipelines.
 
 [Tekton](https://tekton.dev) is a cloud-native solution for building CI/CD
@@ -234,8 +239,10 @@ see the [Tekton documentation](https://tekton.dev/docs/).
 
 **Prerequisites:**
 
-* **OpenShift Cluster:** You need access to an OpenShift cluster.
-* **OpenShift CLI (oc):** Install the OpenShift CLI. Download it
+* **Red Hat OpenShift Cluster:** You need access to
+  a [Red Hat OpenShift](https://www.redhat.
+  com/en/technologies/cloud-computing/openshift) cluster.
+* **Red Hat OpenShift CLI (oc):** Install the OpenShift CLI. Download it
   from [Red Hat Downloads](https://access.redhat.com/downloads/content/290/ver=4.17/rhel---9/4.17.16/x86_64/product-software).
     * Verify installation: `oc version`
 * **Tekton CLI (tkn):** Install the Tekton CLI. Download it
@@ -250,25 +257,30 @@ see the [Tekton documentation](https://tekton.dev/docs/).
         sudo tar xvzf tkn_0.37.1_Linux_x86_64.tar.gz -C /usr/local/bin/ tkn
         ```
     * Verify installation: `tkn version`
-* **Tekton Pipelines:** Tekton Pipelines must be installed on your OpenShift
+* **Tekton Pipelines:** Tekton Pipelines must be installed on your [Red Hat
+  OpenShift](https://www.redhat.com/en/technologies/cloud-computing/openshift)
   cluster.
 
 **Configuration Files:**
 
-* OpenShift configuration files: `openshift/` directory.
+* [Red Hat OpenShift](https://www.redhat.com/en/technologies/cloud-computing/openshift)
+  configuration files: `openshift/` directory.
 * Tekton custom Task files: `openshift/tekton/tasks/` directory.
 * Tekton Pipeline files: `openshift/tekton/pipelines/` directory.
 
 **Setup Steps:**
 
-1. Login to **OpenShift** cluster, using the following command:
+1. Login to the [Red Hat OpenShift](https://www.redhat.
+   com/en/technologies/cloud-computing/openshift) cluster, using the following
+   command:
 
 ```bash
 oc login --token=<token> --server=https://api.,,.p1.openshiftapps.com:6443
 ```
 
 2. Install [Tekton Pipeline](https://github.com/tektoncd/pipeline/releases)
-   on **OpenShift** using the following command:
+   on [Red Hat OpenShift](https://www.redhat.com/en/technologies/cloud-computing/openshift)
+   using the following command:
 
 ```bash
 oc apply -f https://storage.googleapis.com/tekton-releases/pipeline/previous/v0.68.0/release.yaml
@@ -296,7 +308,9 @@ correctly, using the following command:
 tkn version
 ```
 
-4. To create a workspace for pipeline on **OpenShift**, use the following
+4. To create a workspace for pipeline
+   on [Red Hat OpenShift](https://www.redhat.com/en/technologies/cloud-computing/openshift),
+   use the following
    commands:
 
 ```bash
@@ -309,8 +323,9 @@ oc create -f .openshift/cba-pipeline-pvc.yml
 oc apply -f .openshift/cba-pipeline-secret.yml
 ```
 
-6. To create custom [Tekton](https://tekton.dev) tasks for pipeline on *
-   *OpenShift**, use the following commands:
+6. To create custom [Tekton](https://tekton.dev) tasks for pipeline
+   on [Red Hat OpenShift](https://www.redhat.com/en/technologies/cloud-computing/openshift),
+   use the following commands:
 
 ```bash
 oc apply -f .openshift/tekton/tasks/run-cleanup-workspace.yml 
@@ -345,13 +360,17 @@ tkn hub install task openshift-client
 ```
 
 Make sure that the **git-clone**, **buildah** and **openshift-client** tasks
-are available in the **OpenShift** using the following command:
+are available in
+the [Red Hat OpenShift](https://www.redhat.com/en/technologies/cloud-computing/openshift)
+using the following command:
 
 ```bash
 oc get clustertask
 ```
 
-8. To create [Tekton](https://tekton.dev) pipelines on **OpenShift**, use
+8. To create [Tekton](https://tekton.dev) pipelines
+   on [Red Hat OpenShift](https://www.redhat.com/en/technologies/cloud-computing/openshift),
+   use
    the following commands:
 
 ```bash
@@ -361,7 +380,9 @@ oc apply -f .openshift/tekton/pipelines/cba-db-migration-revert-pipeline.yml
 
 **Running Pipelines:**
 
-1. To start CI/CD pipeline on **OpenShift**, use the following command:
+1. To start CI/CD pipeline
+   on [Red Hat OpenShift](https://www.redhat.com/en/technologies/cloud-computing/openshift),
+   use the following command:
 
 ```bash
 tkn pipeline start cba-pipeline \
@@ -397,8 +418,9 @@ tkn pipeline start cba-pipeline \
             --showlog
 ```
 
-2. To start the database migration revert pipeline on **OpenShift**, use the
-   following command:
+2. To start the database migration revert pipeline
+   on [Red Hat OpenShift](https://www.redhat.com/en/technologies/cloud-computing/openshift),
+   use the following command:
 
 ```bash
 tkn pipeline start cba-pipeline \
@@ -510,18 +532,19 @@ endpoints at the following URLs:
   Provides a graphical interface for querying and visualizing metrics.)
 * **Metrics Endpoint:
   ** [http://localhost:19090/metrics](http://localhost:19090/metrics) (Displays
-  the raw metrics data scraped by Prometheus.)
+  the raw metrics data scraped by [Prometheus](https://prometheus.io).)
 * **Targets Endpoint:
   ** [http://localhost:19090/targets](http://localhost:19090/targets) (Shows
   the status of the configured scraping targets.)
 
 **Key Features:**
 
-* Prometheus allows you to monitor the health and performance of our
-  microservices in real-time.
-* You can use the Prometheus Query Language (PromQL) to create custom queries
-  and dashboards.
+* [Prometheus](https://prometheus.io) allows you to monitor the health and
+  performance of our microservices in real-time.
+* You can use
+  the [Prometheus Query Language (PromQL)](https://prometheus.io/docs/prometheus/latest/querying/basics/)
+  to create custom queries and dashboards.
 * Alerting rules can be configured to notify you of critical issues.
 
-**Note:** Ensure Prometheus is running (e.g., via Docker Compose) to access
-these endpoints.
+**Note:** Ensure [Prometheus](https://prometheus.io) is running (e.g., via
+Docker Compose) to access these endpoints.
