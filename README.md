@@ -240,8 +240,8 @@ see the [Tekton documentation](https://tekton.dev/docs/).
 **Prerequisites:**
 
 * **Red Hat OpenShift Cluster:** You need access to
-  a [Red Hat OpenShift](https://www.redhat.
-  com/en/technologies/cloud-computing/openshift) cluster.
+  a [Red Hat OpenShift](https://www.redhat.com/en/technologies/cloud-computing/openshift)
+  cluster.
 * **Red Hat OpenShift CLI (oc):** Install the OpenShift CLI. Download it
   from [Red Hat Downloads](https://access.redhat.com/downloads/content/290/ver=4.17/rhel---9/4.17.16/x86_64/product-software).
     * Verify installation: `oc version`
