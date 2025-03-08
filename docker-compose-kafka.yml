@@ -1,0 +1,78 @@
+# This Docker Compose configuration file sets up a single-node Kafka and
+# Zookeeper environment, designed for development purposes, specifically for
+# Kafka audit logging.
+# 1 kafka broker at port 9093
+# 1 instance of zookeeper at port 2181
+# It should be run under dev profile only
+# Project name
+name: cba
+
+services:
+  zk:
+    image: bitnami/zookeeper:${ZOOKEEPER_VERSION}
+    restart: on-failure
+    ports: # Important: In a production environment you should remove the external port that kept here for debugging purposes.
+      - 12181:2181 # external port / container port
+    environment:
+      - ZOOKEEPER_SERVER_ID=${ZOOKEEPER_SERVER_ID}
+      - ZOOKEEPER_CLIENT_PORT=${ZOOKEEPER_CLIENT_PORT}
+      - ZOOKEEPER_TICK_TIME=${ZOOKEEPER_TICK_TIME}
+      - ZOOKEEPER_INIT_LIMIT=${ZOOKEEPER_INIT_LIMIT}
+      - ZOOKEEPER_SYNC_LIMIT=${ZOOKEEPER_SYNC_LIMIT}
+      - ALLOW_ANONYMOUS_LOGIN=${ALLOW_ANONYMOUS_LOGIN}
+    volumes:
+      - zk-log:/bitnami/zookeeper/log
+      - zk-data:/bitnami/zookeeper/data # creating a volume to save Zookeeper data locally
+    networks:
+      - ${BACKEND_NETWORK}
+    deploy:
+      replicas: 1
+    healthcheck:
+      test: [ "CMD-SHELL", "/opt/bitnami/zookeeper/bin/zkServer.sh status" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  kafka:
+    image: bitnami/kafka:${KAFKA_VERSION}
+    restart: on-failure
+    ports: # Important: In a production environment you should remove the external port that kept here for debugging purposes.
+      - 19093:9093 # external port / container port
+    environment:
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zk:${ZOOKEEPER_CLIENT_PORT}
+      - KAFKA_CFG_LISTENERS=BROKER://0.0.0.0:${KAFKA_BROKER_INTERNAL_PORT},EXTERNAL://0.0.0.0:${KAFKA_BROKER_PORT} # definition of interfaces Kafka binds to
+      - KAFKA_CFG_ADVERTISED_LISTENERS=BROKER://kafka:${KAFKA_BROKER_INTERNAL_PORT},EXTERNAL://kafka:${KAFKA_BROKER_PORT} # definition of running Kafka brokers that clients can connect to
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=BROKER:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=${KAFKA_AUTO_CREATE_TOPICS_ENABLE}
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=${KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR}
+      - KAFKA_INTER_BROKER_LISTENER_NAME=${KAFKA_INTER_BROKER_LISTENER_NAME}
+      - KAFKA_HEAP_OPTS=${KAFKA_HEAP_OPTS} # kafka's Java Heap size
+      - ALLOW_PLAINTEXT_LISTENER=${ALLOW_PLAINTEXT_LISTENER} # allow to use the PLAINTEXT listener
+      - KAFKA_LOG4J_LOGGERS=kafka.server.KafkaServer:DEBUG
+    volumes:
+      - kafka-data:/bitnami/kafka/data # creating a volume to save Kafka data locally
+    depends_on:
+      - zk
+    networks:
+      - ${BACKEND_NETWORK}
+    deploy:
+      replicas: 1
+    healthcheck:
+      test: [ "CMD-SHELL", "kafka-topics.sh --bootstrap-server localhost:${KAFKA_BROKER_PORT} --list" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+# persistent volumes location
+volumes:
+  zk-data:
+    driver: local
+  zk-log:
+    driver: local
+  kafka-data:
+    driver: local
+
+# networks
+networks:
+  cba_net:
+    name: ${BACKEND_NETWORK}

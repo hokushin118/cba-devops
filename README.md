@@ -548,3 +548,92 @@ endpoints at the following URLs:
 
 **Note:** Ensure [Prometheus](https://prometheus.io) is running (e.g., via
 Docker Compose) to access these endpoints.
+
+## Audit with Kafka
+
+CBA microservices utilize [Apache Kafka](https://kafka.apache.org) for robust,
+scalable, and asynchronous audit logging. This architecture facilitates
+centralized logging, real-time monitoring, and efficient data analysis, crucial
+for debugging, security, and compliance. This setup is optimized for
+development, testing, and local experimentation.
+
+**Key Features:**
+
+* **Asynchronous Logging:** [Apache Kafka](https://kafka.apache.org) enables
+  non-blocking audit logging, minimizing performance impact on core
+  microservices.
+* **Centralized Logging:** Consolidated audit logs
+  in [Apache Kafka](https://kafka.apache.org) simplify analysis and correlation
+  across services.
+* **Scalability:** [Apache Kafka](https://kafka.apache.org)'s distributed
+  nature allows for handling increasing audit log volumes.
+* **Real-time Monitoring:** Kafka Streams or similar tools can be used for
+  real-time analysis of audit data.
+
+**Prerequisites:**
+
+* **Docker:** Ensure Docker is installed and running on your system.
+* **Docker Compose:** Ensure Docker Compose is installed.
+* **Environment Variables:** Configure necessary environment variables via
+  a `.env` file or directly in your shell. See the
+  example `docker-compose-kafka.yml` for required variables.
+
+**Launching the Kafka Audit Environment:**
+
+1. **Start Kafka Audit Services:**
+    * Open your terminal and navigate to the directory
+      containing `docker-compose-kafka.yml`.
+    * Execute the following command to start
+      the [Apache Zookeeper](https://zookeeper.apache.org)
+      and [Apache Kafka](https://kafka.apache.org) containers:
+
+        ```bash
+        docker compose -f docker-compose-kafka.yml up -d
+        ```
+
+        * `-f docker-compose-kafka.yml`: Specifies the Docker Compose file to
+          use.
+        * `up`: Starts the containers.
+        * `-d`: Runs the containers in detached mode (background).
+
+2. **Verify Service Status:**
+    * Confirm the services are running correctly:
+
+        ```bash
+        docker ps
+        ```
+
+        * This command lists running Docker containers. You should see the
+          Zookeeper and Kafka containers.
+
+3. **View Container Logs:**
+    * To view the logs of a specific container (e.g., Kafka):
+
+        ```bash
+        docker logs kafka-1
+        ```
+
+        * Replace `kafka-1` with the actual container name.
+
+**Accessing Kafka:**
+
+* **From within the Kafka container:** Use `localhost:9093`
+  for `kafka-console-consumer.sh` and related commands.
+* **From other Docker containers on the same network:** Use `kafka-1:9092` (or
+  the appropriate internal port).
+
+**Interacting with Kafka:**
+
+* **Using `kafka-console-consumer.sh` (within the Kafka container):**
+
+    ```bash
+    docker exec -it kafka-1 /opt/bitnami/kafka/bin/kafka-console-consumer.sh \
+      --bootstrap-server localhost:9093 --topic audit-events --from-beginning
+    ```
+
+**Important Notes:**
+
+* **Environment Variables:** Use a `.env` file for managing environment
+  variables.
+* **Production:** This setup is for development. For production environments,
+  consider a multi-node Kafka cluster and proper security configurations.
