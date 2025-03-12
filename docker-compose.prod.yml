@@ -34,6 +34,17 @@ services:
     deploy:
       replicas: 1
 
+  grafana:
+    extends:
+      file: docker-compose.yml
+      service: grafana
+    pull_policy: always
+    restart: always
+    env_file:
+      - .env.production
+    deploy:
+      replicas: 1
+
   # PostgreSQL object-relational database system is used as Keycloak data storage.
   keycloak-postgres:
     extends:

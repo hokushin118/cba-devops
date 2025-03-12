@@ -549,6 +549,100 @@ endpoints at the following URLs:
 **Note:** Ensure [Prometheus](https://prometheus.io) is running (e.g., via
 Docker Compose) to access these endpoints.
 
+## Grafana Dashboards
+
+CBA microservices utilize [Grafana](https://grafana.com) to create and manage
+dashboards, visualizing metrics collected
+by [Prometheus](https://prometheus.io) from our microservices.
+
+**Purpose:**
+
+[Grafana](https://grafana.com) dashboards provide real-time, visual
+representations of key performance indicators (KPIs) and application health
+metrics. They empower teams to:
+
+* **Monitor Application Performance:** Track request rates, response times,
+  error rates, and resource utilization.
+* **Identify Anomalies:** Quickly detect unexpected behavior and potential
+  issues.
+* **Analyze Trends:** Gain insights into application performance over time.
+* **Troubleshoot Issues:** Drill down into specific metrics to diagnose
+  problems effectively.
+* **Improve Visibility:** Offer a centralized view of application health for
+  development, operations, and business teams.
+
+**Configuration:**
+
+[Grafana](https://grafana.com) configurations are managed via Docker Compose
+and provisioning files, ensuring reproducible and version-controlled setups.
+
+**Key Configuration Aspects:**
+
+* **Data Source Provisioning:**
+    * [Prometheus](https://prometheus.io) is configured as a data source using
+      YAML provisioning files (
+      e.g., `.infrastructure/metrics/grafana/provisioning/datasources/prometheus_ds.yaml`).
+    * This ensures [Grafana](https://grafana.com) automatically connects to the
+      correct [Prometheus](https://prometheus.io) instance upon startup.
+    * The configuration specifies the Prometheus URL, access method (proxy or
+      direct), and other relevant settings.
+* **Dashboard Provisioning:**
+    * [Grafana](https://grafana.com) dashboards are defined in JSON format and
+      provisioned using YAML files (e.g., `all.yml`) located in
+      the `.infrastructure/metrics/grafana/provisioning/dashboards` directory.
+    * This enables version control and automated deployment of dashboards.
+    * Dashboards visualize key metrics, including:
+        * Request rates and response times.
+        * HTTP status code distributions.
+        * Resource utilization (CPU, memory).
+        * Custom application metrics.
+* **Dynamic Data Source Linking:**
+    * In containerized environments (Docker Compose),
+      the [Prometheus](https://prometheus.io) data source UID is dynamically
+      injected into [Grafana](https://grafana.com) dashboard configurations
+      using environment variables.
+    * This ensures seamless connection to
+      the [Prometheus](https://prometheus.io) instance without manual
+      intervention.
+* **Environment Variables:**
+    * [Grafana](https://grafana.com) admin credentials are set via environment
+      variables: `GF_ADMIN_USER` and `GF_ADMIN_PASSWORD`.
+* **Docker Compose:**
+    * [Grafana](https://grafana.com) runs as a Docker container, simplifying
+      deployment and management.
+    * Docker Compose links Grafana to the [Prometheus](https://prometheus.io)
+      service, enabling seamless communication.
+    * Volumes are used for persistent storage of Grafana data and provisioning
+      files.
+
+**Available Dashboards:**
+
+* **Flask Monitoring Dashboard:**
+    * Located in
+      the `.infrastructure/metrics/grafana/provisioning/dashboards/flask-monitoring.json`
+      file.
+    * Focuses on real-time monitoring (3-second refresh, 5-minute time range).
+    * Covers essential metrics like request rates, error rates, response times,
+      and resource usage.
+    * Utilizes common Prometheus queries for Flask applications.
+    * Monitors performance of successful requests and errors.
+    * Uses percentiles to monitor request latency.
+    * Monitors CPU and memory usage.
+    * Displays:
+        * Rate of successful (HTTP 200) requests per second.
+        * Rate of error requests (non-200 HTTP status codes) per second.
+        * Total requests per minute, broken down by HTTP status code.
+        * Average response time (seconds) for successful requests (HTTP 200)
+          over 30 seconds.
+        * 50th percentile (median) request duration (seconds) for successful
+          requests (HTTP 200) over 30 seconds.
+        * Resident memory usage (bytes) of the Flask application process.
+        * Percentage of successful requests (HTTP 200) with response times
+          under 250 milliseconds over 30 seconds.
+        * 90th percentile request duration (seconds) for successful requests (
+          HTTP 200) over 30 seconds.
+        * CPU usage of the Flask application process.
+
 ## Audit with Kafka
 
 CBA microservices utilize [Apache Kafka](https://kafka.apache.org) for robust,
