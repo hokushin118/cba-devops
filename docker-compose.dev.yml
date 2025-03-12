@@ -36,6 +36,21 @@ services:
     deploy:
       replicas: 1
 
+  grafana:
+    extends:
+      file: docker-compose.yml
+      service: grafana
+    ports: # Important: In a production environment you should remove the external port that kept here for debugging purposes.
+      - 3000:3000 # external port / container port
+    env_file:
+      - .env.docker
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GF_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_ADMIN_PASSWORD}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    deploy:
+      replicas: 1
+
   # PostgreSQL object-relational database system is used as Keycloak data storage.
   keycloak-postgres:
     extends:

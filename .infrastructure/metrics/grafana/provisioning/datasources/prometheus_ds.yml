@@ -1,0 +1,22 @@
+# Grafana Data Source Configuration for Prometheus
+# config file version
+apiVersion: 1
+
+# list of datasources that should be deleted from the database
+deleteDatasources:
+  - name: Prometheus
+    orgId: 1
+
+# list of datasources to insert/update depending
+# what's available in the database
+datasources:
+  - name: Prometheus # Name of the datasource. Required
+    type: prometheus # Datasource type. Required
+    access: proxy  # Or 'direct' if Grafana and Prometheus are on the same network
+    orgId: 1 # Org id. will default to orgId 1 if not specified
+    url: http://prometheus:9090
+    isDefault: true # Mark as default datasource
+    editable: true # Allow editing from the grafana ui.
+    jsonData:
+      httpMethod: GET # Explicitly set the httpMethod.
+    version: 1 # Explicitly set the version.

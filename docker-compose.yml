@@ -44,6 +44,28 @@ services:
         max-size: 10m
         max-file: 5
 
+  # Grafana (visualize metrics) - http://<host-ip>:3000
+  # Example: http://localhost:3000
+  grafana:
+    image: grafana/grafana:${GF_VERSION}
+    hostname: ${GF_HOSTNAME}
+    restart: on-failure
+    user: "104" # setting up the user to use over the Docker container to allow reads/writes over disk
+    volumes:
+      - ./.infrastructure/metrics/grafana/provisioning:/etc/grafana/provisioning
+      - ./.infrastructure/metrics/grafana/provisioning/dashboards/all.yml:/etc/grafana/dashboards/all.yml
+      - ./.infrastructure/metrics/grafana/provisioning/dashboards:/etc/grafana/dashboards
+      - grafana-data:/var/lib/grafana # creating a volume to save Grafana data locally
+    depends_on:
+      - prometheus
+    networks:
+      - ${BACKEND_NETWORK}
+    logging: # Common logging config
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: 5
+
   # PostgreSQL object-relational database system is used as Keycloak data storage.
   keycloak-postgres:
     hostname: keycloak
@@ -95,6 +117,8 @@ volumes:
   keycloak-postgresql-data:
     driver: local
   prometheus_data:
+    driver: local
+  grafana-data:
     driver: local
   cache-data:
     driver: local

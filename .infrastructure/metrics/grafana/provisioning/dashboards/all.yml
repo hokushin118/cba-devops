@@ -1,0 +1,20 @@
+# Grafana dashboard provisioning configuration
+# grafana/provisioning/dashboards/all.yml
+apiVersion: 1
+
+providers:
+  - name: 'CBA Monitoring'
+    orgId: 1
+    folder: ''
+    type: file
+    allowUiUpdates: true
+    disableDeletion: true
+    editable: true
+    updateIntervalSeconds: 30
+    options:
+      path: /etc/grafana/provisioning/dashboards
+      foldersFromFilesStructure: true
+      # Optional: Explicitly specify file names to load (if needed)
+      # files:
+      #   - 'dashboard1.json'
+      #   - 'dashboard2.json'
