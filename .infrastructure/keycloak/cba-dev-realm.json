@@ -480,9 +480,7 @@
         }
       ],
       "disableableCredentialTypes": [],
-      "requiredActions": [
-        "UPDATE_PASSWORD"
-      ],
+      "requiredActions": [],
       "realmRoles": [
         "default-roles-cba-dev",
         "ROLE_USER"

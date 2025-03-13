@@ -484,6 +484,20 @@ authentication and authorization.
 * This configuration is automatically imported when Keycloak is deployed using
   Docker Compose.
 
+**Realm Users (Development/Testing):**
+
+The following test users are available in the development/testing realm
+**cba-dev**.
+
+| **user name** | **password** | **roles**                     |
+|---------------|--------------|-------------------------------|
+| admin         | admin        | __ROLE_ADMIN__, __ROLE_USER__ |
+| test          | test         | __ROLE_USER__                 |
+
+**Important Note:** The `admin` user listed above is a test user within the
+development/testing realm **cba-dev**. It is distinct from the `admin`
+superuser account associated with the **master** realm.
+
 **Realm Roles (Development/Testing):**
 
 * For development and testing purposes, the following realm roles are added:
