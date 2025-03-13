@@ -576,6 +576,16 @@ metrics. They empower teams to:
 [Grafana](https://grafana.com) configurations are managed via Docker Compose
 and provisioning files, ensuring reproducible and version-controlled setups.
 
+**Accessing Grafana:**
+
+The [Grafana](https://grafana.com) web interface is available at:
+
+* [http://localhost:3000](http://localhost:3000)
+  (Provides a graphical interface for querying and visualizing metrics.)
+* Upon the initial launch, you will be prompted to enter your credentials.
+  Use **admin** for both the username and password.
+* You will then be prompted to change your initial login credentials.
+
 **Key Configuration Aspects:**
 
 * **Data Source Provisioning:**
@@ -617,9 +627,11 @@ and provisioning files, ensuring reproducible and version-controlled setups.
 
 **Available Dashboards:**
 
-* **Flask Monitoring Dashboard:**
+* **Account Monitoring Dashboard:**
+    * [Account](https://github.com/hokushin118/account-service) microservice
+      Grafana dashboard.
     * Located in
-      the `.infrastructure/metrics/grafana/provisioning/dashboards/flask-monitoring.json`
+      the `.infrastructure/metrics/grafana/provisioning/dashboards/account-monitoring.json`
       file.
     * Focuses on real-time monitoring (3-second refresh, 5-minute time range).
     * Covers essential metrics like request rates, error rates, response times,

@@ -15,6 +15,5 @@ providers:
       path: /etc/grafana/provisioning/dashboards
       foldersFromFilesStructure: true
       # Optional: Explicitly specify file names to load (if needed)
-      # files:
-      #   - 'dashboard1.json'
-      #   - 'dashboard2.json'
+      files:
+        - 'account-monitoring.json'
