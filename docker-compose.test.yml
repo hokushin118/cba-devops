@@ -39,7 +39,7 @@ services:
     ports: # Important: In a production environment you should remove the external port that kept here for debugging purposes.
       - 3000:3000 # external port / container port
     env_file:
-      - .env.docker
+      - .env.testing
     environment:
       - GF_SECURITY_ADMIN_USER=${GF_ADMIN_USER}
       - GF_SECURITY_ADMIN_PASSWORD=${GF_ADMIN_PASSWORD}
@@ -99,7 +99,7 @@ services:
     ports: # Important: In a production environment you should remove the external port that kept here for debugging purposes.
       - 16379:6379 # external port / container port
     env_file:
-      - .env.docker
+      - .env.testing
     environment:
       - REDIS_REPLICATION_MODE=master
       - REDIS_PASSWORD=${REDIS_PASSWORD}
