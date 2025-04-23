@@ -1,0 +1,47 @@
+# This Docker Compose configuration file sets up a single-node MinIO
+# environment, designed for development purposes.
+# Project name
+name: cba
+
+services:
+  minio:
+    image: minio/minio:${MINIO_VERSION:-latest}
+    restart: on-failure
+    ports: # Important: In a production environment you should remove the external port that kept here for debugging purposes.
+      - 9000:9000 # API port
+      - 9001:9001 # Console UI port
+    env_file:
+      - .env
+    # Command to use multiple data directories (minimum 4 for erasure coding)
+    command: server /data{1...4} --console-address ":9001"
+    volumes:
+      # Map multiple named volumes (minimum 4)
+      - minio-data1:/data1
+      - minio-data2:/data2
+      - minio-data3:/data3
+      - minio-data4:/data4
+    networks:
+      - ${BACKEND_NETWORK}
+    healthcheck:
+      test: [ 'CMD', 'mc', 'ready', 'local' ]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+      start_period: 30s
+
+# persistent volumes location
+volumes:
+  # Define all the volumes
+  minio-data1:
+    driver: local
+  minio-data2:
+    driver: local
+  minio-data3:
+    driver: local
+  minio-data4:
+    driver: local
+
+# networks
+networks:
+  cba_net:
+    name: ${BACKEND_NETWORK}
