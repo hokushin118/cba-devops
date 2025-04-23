@@ -11,16 +11,10 @@ services:
       - 28017:27017 # docker host port / container port
     env_file:
       - .env
-    environment:
-      - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE} # the database
-      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME} # the database admin user
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD} # the database admin user password
     volumes:
       - mongodb-data:/data/db # creating a volume to save MongoDB data locally
     networks:
       - ${BACKEND_NETWORK}
-    deploy:
-      replicas: 1
     healthcheck:
       # Command to check if MongoDB server is responsive
       test: |
