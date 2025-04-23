@@ -1,0 +1,48 @@
+# This Docker Compose configuration file sets up a single-node MongoDB
+# environment, designed for development purposes.
+# Project name
+name: cba
+
+services:
+  mongo:
+    image: mongo:${MONGO_VERSION}
+    restart: on-failure
+    ports: # Important: In a production environment you should remove the external port that kept here for debugging purposes.
+      - 28017:27017 # docker host port / container port
+    env_file:
+      - .env
+    environment:
+      - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE} # the database
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME} # the database admin user
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD} # the database admin user password
+    volumes:
+      - mongodb-data:/data/db # creating a volume to save MongoDB data locally
+    networks:
+      - ${BACKEND_NETWORK}
+    deploy:
+      replicas: 1
+    healthcheck:
+      # Command to check if MongoDB server is responsive
+      test: |
+        mongosh \
+          --host localhost \
+          --port 27017 \
+          --username ${MONGO_INITDB_ROOT_USERNAME} \
+          --password ${MONGO_INITDB_ROOT_PASSWORD} \
+          --authenticationDatabase admin \
+          --quiet \
+          --eval 'db.adminCommand("ping")' || exit 1
+      interval: 15s        # How often to run the check
+      timeout: 10s         # Max time allowed for the check command
+      retries: 3           # Attempts before marking as unhealthy
+      start_period: 30s    # Grace period for initialization before first check counts
+
+# persistent volumes location
+volumes:
+  mongodb-data:
+    driver: local
+
+# networks
+networks:
+  cba_net:
+    name: ${BACKEND_NETWORK}
