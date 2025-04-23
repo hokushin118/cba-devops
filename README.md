@@ -883,3 +883,121 @@ locally for development and testing using Docker Compose.
   your host machine. To completely reset the database, you need to stop the
   container (docker compose -f ... down), remove the volume (docker volume rm <
   volume_name>), and then start it again (docker compose -f ... up -d).
+
+# MinIO for Local Object Storage (S3 Compatible)
+
+CBA microservices utilize [MinIO](https://min.io) to provide
+an [S3-compatible](https://en.wikipedia.org/wiki/Amazon_S3)
+object storage service locally via Docker Compose. This setup simulates
+multiple drives using Docker volumes, allowing you to test applications that
+interact with S3 APIs and potentially observe [MinIO](https://min.io)'s erasure
+coding behavior in a development environment.
+
+**Key Features of this Setup:**
+
+* **S3 Compatibility:** Provides a standard S3 API
+  endpoint (http://localhost:9000) for CBA microservices or tools.
+* **Web Console:** Includes the [MinIO](https://min.io) Console web
+  UI (http://localhost:9001) for easy bucket and object management.
+* **Local Erasure Coding Simulation:** Uses multiple Docker volumes (/data1 to
+  /data4) to mimic the multi-drive setup required for [MinIO](https://min.io)'s
+  default erasure coding, enabling testing of this feature locally.
+* **Persistent Storage::** Uses Docker named volumes (minio-data1, etc.) to
+  persist your buckets and objects even when the container is stopped and
+  restarted.
+* **Configurable:** Leverages environment variables (via a .env file) for root
+  credentials.
+
+**Prerequisites:**
+
+* **Docker:** Ensure Docker is installed and running on your system.
+* **Docker Compose:** Ensure Docker Compose is installed.
+* **Environment Variables:** A .env file is required in the same directory as
+  `docker-compose-minio.yml` (or your main compose file if combined).
+
+**Launching the MongoDB Environment:**
+
+1. **Start [MinIO](https://min.io) Service:**
+    * Open your terminal and navigate to the directory
+      containing `docker-compose-minio.yml`.
+    * Execute the following command to start
+      the [MinIO](https://min.io) container:
+
+        ```bash
+        docker compose -f docker-compose-minio.yml up -d
+        ```
+
+        * `-f docker-compose-minio.yml`: Specifies the Docker Compose file to
+          use.
+        * `up`: Starts the containers.
+        * `-d`: Runs the containers in detached mode (background).
+
+2. **Verify Service Status:**
+    * Confirm the services are running correctly:
+
+        ```bash
+        docker compose -f docker-compose-minio.yml ps
+        ```
+
+        * This command lists running Docker containers. You should
+          see the [MinIO](https://min.io) container.
+
+3. **View Container Logs:**
+    * To view the logs of a specific container (e.g., [MinIO](https://min.io)):
+
+        ```bash
+        docker compose -f docker-compose-minio.yml logs minio
+        ```
+
+**Accessing to [MinIO](https://min.io):**
+
+* **MinIO Console (Web UI):**
+
+    * Open your web browser and navigate to: http://localhost:9001.
+    * Log in using the **MINIO_ROOT_USER** and **MINIO_ROOT_PASSWORD** from
+      your .env file.
+
+* **S3 API Endpoint:**
+
+    * Configure your S3 clients (AWS CLI, SDKs like boto3, mc) to use:
+
+    - Endpoint URL: http://localhost:9000.
+    - Access Key ID: The value of **MINIO_ROOT_USER** from .env.
+    - Secret Access Key: The value of **MINIO_ROOT_PASSWORD** from .env.
+    - Region: Often optional for [MinIO](https://min.io).
+
+* **From Other Docker Containers (on the same network):**
+
+    * Use the service name (minio by default) and the internal API port (9000).
+    * Example Endpoint URL: http://minio:9000.
+
+* **Example AWS CLI Configuration:**
+
+    ```
+    aws configure --profile minio-local
+    AWS Access Key ID [None]: admin # MINIO_ROOT_USER
+    AWS Secret Access Key [None]: minio12345 # MINIO_ROOT_PASSWORD
+    Default region name [None]: # Leave blank
+    Default output format [None]: json
+    
+    # List buckets
+    aws --profile minio-local --endpoint-url http://localhost:9000 s3 ls
+    
+    # Create a bucket
+    aws --profile minio-local --endpoint-url http://localhost:9000 s3 mb s3://my-test-bucket
+    
+    # Upload a file
+    aws --profile minio-local --endpoint-url http://localhost:9000 s3 cp ./local-file.txt s3://my-test-bucket/
+    ```
+
+* **Important Notes:**
+
+* **Development Only:** This single-node setup is not suitable for production
+  High Availability. Production requires a distributed setup across multiple
+  servers.
+* **Security:** Use strong, unique credentials in your .env file and ensure
+  it's not committed to version control.
+* **Data Persistence:** Data is stored in the minio-dataX Docker volumes. To
+  completely reset MinIO storage, stop the container (docker compose -f ...
+  down), remove the volumes (docker volume rm minio-data1 minio-data2
+  minio-data3 minio-data4), and start again (docker compose -f ... up -d).
