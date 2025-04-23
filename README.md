@@ -757,3 +757,129 @@ development, testing, and local experimentation.
   variables.
 * **Production:** This setup is for development. For production environments,
   consider a multi-node Kafka cluster and proper security configurations.
+
+# MongoDB for Local Development (Image Metadata Storage)
+
+CBA microservices utilize [MongoDB](https://www.mongodb.com) for storing image
+metadata within the CBA microservice
+architecture. [MongoDB](https://www.mongodb.com) provides a
+flexible and scalable NoSQL database solution, well-suited for potentially
+evolving metadata structures. This document outlines how to set up MongoDB
+locally for development and testing using Docker Compose.
+
+**Key Features of this Setup:**
+
+* **Flexible Document Model:** MongoDB's BSON document format is ideal for
+  storing varied and potentially nested image metadata without requiring a
+  rigid upfront schema.
+* **Persistent Storage:** Uses a Docker named volume (mongodb-data) to persist
+  your metadata even when the container is stopped and restarted.
+* **Simplified Local Setup:** Provides a
+  single-node [MongoDB](https://www.mongodb.com) instance suitable
+  for local development, testing, and experimentation via Docker Compose.
+* **Configurable:** Leverages environment variables (via a .env file) for
+  database initialization details (user, password, database name).
+
+**Prerequisites:**
+
+* **Docker:** Ensure Docker is installed and running on your system.
+* **Docker Compose:** Ensure Docker Compose is installed.
+* **Environment Variables:** Configure necessary environment variables via
+  a `.env` file or directly in your shell. See the
+  example `docker-compose-mongo.yml` for required variables.
+
+**Launching the MongoDB Environment:**
+
+1. **Start MongoDB Services:**
+    * Open your terminal and navigate to the directory
+      containing `docker-compose-mongo.yml`.
+    * Execute the following command to start
+      the MongoDB container:
+
+        ```bash
+        docker compose -f docker-compose-mongo.yml up -d
+        ```
+
+        * `-f docker-compose-mongo.yml`: Specifies the Docker Compose file to
+          use.
+        * `up`: Starts the containers.
+        * `-d`: Runs the containers in detached mode (background).
+
+2. **Verify Service Status:**
+    * Confirm the services are running correctly:
+
+        ```bash
+        docker compose -f docker-compose-mongo.yml ps
+        ```
+
+        * This command lists running Docker containers. You should
+          see the MongoDB container.
+
+3. **View Container Logs:**
+    * To view the logs of a specific container (e.g., MongoDB):
+
+        ```bash
+        docker compose -f docker-compose-mongo.yml logs mongo
+        ```
+
+**Connecting to MongoDB:**
+
+* **From Your Microservice (Running in Docker on the same network):**
+
+  The microservice container (defined in a separate docker-compose.yml or
+  started manually on the same network) should connect using the service name
+  defined in docker-compose-mongo.yml (which is mongo by default) and the
+  internal MongoDB port (27017).
+
+  Example Connection String (adjust user/pass/db):
+
+  ```
+  mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:
+  27017/${MONGO_INITDB_DATABASE}?authSource=admin
+  ```
+
+* **From Your Host Machine (e.g., MongoDB Compass, Studio 3T, local script):**
+
+  Connect using localhost (or 127.0.0.1) and the mapped host port specified in
+  the ports section of docker-compose-mongo.yml (e.g., 27017 if you used 27017:
+  27017).
+
+  Use the same root username and password from your .env file.
+  Authentication Database should typically be admin.
+
+  Example Connection String:
+
+  ```
+  mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@localhost:
+  27017/${MONGO_INITDB_DATABASE}?authSource=admin
+   ```
+
+  **Interacting with MongoDB:**
+
+  You can directly interact with MongoDB inside the running container using
+  the MongoDB Shell (mongosh):
+
+    ```bash
+    docker compose -f docker-compose-mongo.yml exec mongo mongosh \
+      --username ${MONGO_INITDB_ROOT_USERNAME} \
+      --password ${MONGO_INITDB_ROOT_PASSWORD} \
+      --authenticationDatabase admin \
+      ${MONGO_INITDB_DATABASE}
+    ```
+
+  This opens an interactive shell connected to your specified database. You can
+  run commands like db.collectionName.find(), show collections, etc.
+
+* **Important Notes:**
+
+* **Development Only:** This single-node setup is intended for local
+  development and testing. It lacks the high availability and fault tolerance
+  of a production MongoDB replica set or Atlas cluster.
+* **Security:** The root user/password provides full admin access. Be mindful
+  of the security implications, especially if mapping the port publicly (which
+  is discouraged). Do not use default or weak passwords. Ensure your
+  production .env file is ignored by Git.
+* **Data Persistence:** Data is stored in the mongodb-data Docker volume on
+  your host machine. To completely reset the database, you need to stop the
+  container (docker compose -f ... down), remove the volume (docker volume rm <
+  volume_name>), and then start it again (docker compose -f ... up -d).
